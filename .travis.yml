@@ -1,38 +1,48 @@
 language: node_js
 node_js:
-- '0.10'
-before_script:
-- npm install -g gulp
-- source deploy/tags.sh
+  - '0.10'
+before_install:
+  - source deploy/tags.sh
+  - npm install -g gulp
 before_deploy:
-- gulp build
+  - gulp build
 deploy:
-- provider: s3
-  access_key_id: $AWS_S3_ID
-  secret_access_key: $AWS_S3_SECRET
-  bucket: cdn.goinstant.net
-  local-dir: dist
-  upload-dir: integrations/goangular/latest
-  on:
-    all_branches: true
-    repo: goinstant/goangular
-    condition:
-    - $IS_TAG != 0
-    - $IS_LATEST != 0
-- provider: s3
-  access_key_id: $AWS_S3_ID
-  secret_access_key: $AWS_S3_SECRET
-  bucket: cdn.goinstant.net
-  local-dir: dist
-  upload-dir: integrations/goangular/$TRAVIS_BRANCH
-  on:
-    all_branches: true
-    repo: goinstant/goangular
-    condition:
-    - $IS_TAG != 0
+  - provider: s3
+    access_key_id: $AWS_S3_ID
+    secret_access_key: $AWS_S3_SECRET
+    bucket: cdn.goinstant.net
+    local-dir: dist
+    upload-dir: integrations/goangular/latest
+    on:
+      all_branches: true
+      repo: goinstant/goangular
+      condition:
+      - $IS_TAG != 0
+      - $IS_LATEST != 0
+  - provider: s3
+    access_key_id: $AWS_S3_ID
+    secret_access_key: $AWS_S3_SECRET
+    bucket: cdn.goinstant.net
+    local-dir: dist
+    upload-dir: integrations/goangular/$TRAVIS_BRANCH
+    on:
+      all_branches: true
+      repo: goinstant/goangular
+      condition:
+      - $IS_TAG != 0
 after_deploy:
-- echo "deployed $TRAVIS_BRANCH"
+  - node deploy/hipchat-notify.js
+notifications:
+  hipchat:
+    rooms:
+      secure: WuFGTZcC0JB15+myQtWoCoINYxE9YmePNZjz4iXiDgGLh/swgYIgGyLCAsSavtmVldNkwOOEg4YGXEHgt4ilpvvzfssa0efEdVfxS9PA5LVGToR777foT199zq7OudLG2x6zARhEPgSitE2hJ76uLk3HDmcCFzanpDOm8eRd+Ds=
+    template:
+    - '<a href="%{build_url}">%{branch}</a> - <a href="%{compare_url}">%{commit}</a>
+      : %{message}'
+    format: html
 env:
   global:
   - secure: C3ns4bIP1h9PzP127HeXTdIFWLshNj6CQENyT1BUWxmRFYfRHWQHTLXhYtw9Clv42L+kehoEA6Lak4hyNQXa0J26d4skum0YHVycIoS90bE96TN5I3NYSTWJI61lou0cl+D1kByrTIqr1jZxomGNGF+xWmxcwaXIwTntegPPwnQ=
   - secure: mswog/W9YCauQbjUA9FCjwP/WkH3mV5QPPcQHOG4CgaT70UXeYeKJPol+oNimBe4jzmsrmd8emsZHvD2sW2pIbrX9v1ZIUZwUH++R1z+EiqvP31sed/CcpEiUH5s1dMnQ/lTFmvTP0ILBFFe7X1NYmicT11rhrvGRGV55Ps37Rw=
+  - secure: pA+rzOGsqTh1SEQKdKP1FqC5P0NhO2G/PA1EOMS1/KK94I7jwj64ayzVDjiD2NvhyjGltOwLc+Rl0SsHTJ589zFbRqXnEneZCp8sO9cSE/5LdF8fu96OlBPLUbd150++E/8stJuWP+TM7zE9biBfe0DQK8hHC4XccoTxhLFW3k8=
+  - secure: S+TTNB1Fa3wV4e1StMbwYSoV1BKkQw8M++wUtPSAP0ELSZPilOGBS/zXbf3us9WgRv9TDopm3QnHpfWj5HB2MeptQHkngxyjTs9WgVMzJjJi/AyTOFSrYbZ6t9qGQ09olXhSGNB9W74P6jHcbUoPqdRjf6wD7oaj0cuGcziCW20=
